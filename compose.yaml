@@ -5,6 +5,25 @@ services:
       dockerfile: packages/backend/Dockerfile
     ports:
       - "8000:80"
+    depends_on:
+      - database
+      - ollama
+
+  database:
+    image: pgvector/pgvector:pg18-trixie
+    restart: always
+  
+    environment:
+      POSTGRES_DB: second-mind
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./database/schema:/docker-entrypoint-initdb.d
+    secrets:
+      - db_password
 
   ollama:
     image: ollama/ollama:latest
@@ -26,3 +45,10 @@ services:
 networks:
   llm-network:
     driver: bridge
+
+secrets:
+  db_password:
+    file: database/db_password.txt
+
+volumes:
+  postgres_data:
