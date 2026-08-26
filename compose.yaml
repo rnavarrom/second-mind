@@ -10,7 +10,8 @@ services:
         condition: service_healthy
         restart: true
       ollama:
-        condition: service_started
+        condition: service_healthy
+        restart: true
 
   database:
     image: pgvector/pgvector:pg18-trixie
@@ -42,6 +43,14 @@ services:
       - llm-network
     ports:
       - "11434:11434"
+    healthcheck:
+      test: "ollama --version && ollama ps || exit 1"
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    volumes:
+      - ollama_data:/root/.ollama
     deploy:
       resources:
         reservations:
@@ -60,3 +69,4 @@ secrets:
 
 volumes:
   postgres_data:
+  ollama_data:
