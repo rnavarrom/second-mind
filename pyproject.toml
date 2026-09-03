@@ -1,5 +1,0 @@
-[tool.uv.workspace]
-members = [
-    "packages/frontend",
-    "packages/backend",
-]
